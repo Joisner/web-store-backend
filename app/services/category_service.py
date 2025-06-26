@@ -24,3 +24,4 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
 category_service = CRUDCategory(Category)
 get_multi_paginated = category_service.get_multi_paginated
 get_multi = category_service.get_multi
+get = category_service.get

@@ -11,7 +11,7 @@ from .user import User, UserCreate, UserUpdate, UserLogin, UserInDB, UserStatus
 from .category import Category, CategoryCreate, CategoryUpdate, CategorySimple
 
 # Product Image Schemas
-from .product_image import ProductImage, ProductImageCreate, ProductImageUpdate
+from .product_image import ProductImage, ProductImageCreate  # Elimina ProductImageUpdate si no existe
 
 # Product Variant Schemas
 from .product_variant import ProductVariant, ProductVariantCreate, ProductVariantUpdate, VariantType

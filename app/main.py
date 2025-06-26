@@ -12,6 +12,7 @@ from pydantic import ValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.exc import IntegrityError
 from contextlib import asynccontextmanager
+from fastapi.staticfiles import StaticFiles
 
 from app.api.v1 import api_router
 from app.core.config import settings
@@ -82,6 +83,9 @@ if settings.BACKEND_CORS_ORIGINS:
 else:
     print("Warning: No CORS origins configured. CORS will not be enabled.")
 
+# Asegúrate de que la carpeta 'media' exista en la raíz del proyecto
+os.makedirs("media", exist_ok=True)
+app.mount("/media", StaticFiles(directory="media"), name="media")
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 

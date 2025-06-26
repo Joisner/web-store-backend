@@ -1,23 +1,29 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel
 from typing import Optional
 
 class ProductImageBase(BaseModel):
-    url: HttpUrl
+    url: str  # <-- Debe ser str, NO HttpUrl ni AnyUrl
     alt: Optional[str] = None
     display_order: Optional[int] = 0
-    is_main: Optional[bool] = False
+    is_main: bool
 
 class ProductImageCreate(ProductImageBase):
     pass
 
-class ProductImageUpdate(BaseModel):
-    url: Optional[HttpUrl] = None
-    alt: Optional[str] = None
-    display_order: Optional[int] = None
-    is_main: Optional[bool] = None
-
-class ProductImage(ProductImageBase):
+class ProductImage(BaseModel):
     id: int
+    url: str
+    alt: Optional[str] = None
+    display_order: Optional[int] = 0
+    is_main: bool
+    product_id: int
+
+    model_config = {
+        "from_attributes": True
+    }
+
+class ProductImageUpdate(ProductImageCreate):
+    pass
     product_id: int # Ensure this is present if you need to expose it
 
     class Config:

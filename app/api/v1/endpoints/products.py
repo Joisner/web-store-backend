@@ -1,12 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Body, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Body, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from typing import List, Optional, Any
+import os
+import base64
+from PIL import Image, UnidentifiedImageError
+import io
 
 from app import schemas
 from app.services import product_service, category_service # Assuming category_service exists for validation
 from app.db.session import get_db
 from app.api import dependencies # For authentication/authorization
 from app.models.user import User # To type hint current_user
+from app.api.dependencies import get_current_active_user  # Ajusta el path si tu dependencia está en otro módulo
+from app.schemas.product_image import ProductImageCreate
 
 router = APIRouter()
 
@@ -146,22 +152,6 @@ async def deactivate_product_by_id(
 
 
 # Endpoints for Product Images (example)
-@router.post(
-    "/{product_id}/images",
-    response_model=schemas.ProductImage,
-    status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(dependencies.get_current_active_user)]
-)
-async def add_product_image_to_product(
-    product_id: int,
-    image_in: schemas.ProductImageCreate,
-    db: Session = Depends(get_db)
-):
-    product = product_service.get(db, id=product_id)
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return product_service.add_product_image(db, product=product, image_in=image_in)
-
 @router.delete(
     "/images/{image_id}",
     response_model=schemas.ProductImage,
@@ -176,7 +166,87 @@ async def delete_product_image_from_product(
         raise HTTPException(status_code=404, detail="Image not found")
     return deleted_image
 
+@router.post("/{product_id}/images", status_code=status.HTTP_201_CREATED, response_model=schemas.ProductImage)
+async def upload_product_image(
+    product_id: int,
+    image: UploadFile = File(...),
+    is_main: bool = Form(False),
+    alt: Optional[str] = Form(None),
+    display_order: Optional[int] = Form(0),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    Upload an image for a product.
+    Expects multipart/form-data with 'image' (file), 'is_main' (bool), 'alt' (str, optional), 'display_order' (int, optional).
+    """
+    product = product_service.get(db, id=product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Leer el archivo original
+    original_content = await image.read()
+    input_stream = io.BytesIO(original_content)
+    try:
+        img = Image.open(input_stream)
+        if img.mode in ("RGBA", "LA"):
+            img = img.convert("RGB")
+        output_stream = io.BytesIO()
+        img.save(output_stream, format="JPEG", quality=70)
+        compressed_content = output_stream.getvalue()
+        image_base64 = base64.b64encode(compressed_content).decode("utf-8")
+        mime_type = "image/jpeg"
+    except UnidentifiedImageError:
+        # Si el formato no es soportado, guarda el archivo original en base64
+        image_base64 = base64.b64encode(original_content).decode("utf-8")
+        mime_type = image.content_type or "application/octet-stream"
+    data_url = f"data:{mime_type};base64,{image_base64}"
+
+    image_in = ProductImageCreate(
+        url=data_url,
+        alt=alt,
+        display_order=display_order,
+        is_main=is_main
+    )
+
+    db_image = product_service.add_product_image(db, product=product, image_in=image_in)
+    return db_image
+
 # Similar endpoints can be added for Product Variants
 # POST /{product_id}/variants
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# Similar endpoints can be added for Product Variants
+# POST /{product_id}/variants
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
+# PUT /variants/{variant_id}
+# DELETE /variants/{variant_id}
 # PUT /variants/{variant_id}
 # DELETE /variants/{variant_id}

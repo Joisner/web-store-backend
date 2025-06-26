@@ -150,7 +150,10 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
     # Methods for managing Product Images (example)
     def add_product_image(self, db: Session, *, product: Product, image_in: ProductImageCreate) -> ProductImage:
-        db_image = ProductImage(**image_in.model_dump(), product_id=product.id)
+        # Solo pasa los campos válidos para ProductImage
+        image_data = image_in.model_dump()
+        image_data.pop("filename", None)  # Elimina filename si existe
+        db_image = ProductImage(**image_data, product_id=product.id)
         try:
             db.add(db_image)
             db.commit()
@@ -193,3 +196,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
 product_service = CRUDProduct(Product)
 get_multi_paginated = product_service.get_multi_paginated
+create = product_service.create
+get = product_service.get
+update = product_service.update
+add_product_image = product_service.add_product_image

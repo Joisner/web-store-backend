@@ -56,18 +56,20 @@ async def pydantic_validation_exception_handler(request: Request, exc: Validatio
     This makes validation errors more user-friendly by returning a 422 status
     and a structured error message.
     """
-    # error_details = []
-    # for error in exc.errors():
-    #     field = ".".join(str(loc) for loc in error["loc"])
-    #     message = error["msg"]
-    #     error_type = error["type"]
-    #     error_details.append({"field": field, "message": message, "type": error_type})
 
-    # Simplified error response, FastAPI >0.100.0 handles this structure well by default for RequestValidationError
+    def clean_errors(errors):
+        # Convierte cualquier valor bytes a string
+        if isinstance(errors, list):
+            for err in errors:
+                if isinstance(err, dict):
+                    for k, v in err.items():
+                        if isinstance(v, bytes):
+                            err[k] = v.decode(errors="replace")
+        return errors
+
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        # content={"detail": "Validation Error", "errors": error_details},
-        content={"detail": exc.errors()} # FastAPI's default RequestValidationError handler uses this format
+        content={"detail": clean_errors(exc.errors())}
     )
 
 async def general_exception_handler(request: Request, exc: Exception):

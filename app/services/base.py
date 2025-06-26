@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union, Tuple
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
@@ -40,7 +40,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def get_multi_paginated(
         self, db: Session, *, skip: int = 0, limit: int = 100
-    ) -> (List[ModelType], int):
+    ) -> Tuple[List[ModelType], int]:
         total = db.query(self.model).count()
         items = db.query(self.model).offset(skip).limit(limit).all()
         return items, total
