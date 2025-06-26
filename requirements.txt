@@ -1,0 +1,33 @@
+# Core FastAPI and ASGI server
+fastapi>=0.100.0,<0.112.0 # Loosened upper bound slightly
+uvicorn[standard]>=0.27.0,<0.29.0 # Loosened upper bound slightly
+
+# Database ORM and MySQL driver
+sqlalchemy>=2.0.20,<2.1.0
+pymysql>=1.1.0,<1.2.0
+
+# Password hashing and JWT
+passlib[bcrypt]>=1.7.4,<1.8.0
+python-jose[cryptography]>=3.3.0,<3.4.0
+
+# Settings management
+pydantic-settings>=2.1.0,<2.3.0 # Loosened upper bound slightly
+
+# For form data (e.g. OAuth2PasswordRequestForm)
+python-multipart>=0.0.9,<0.0.10
+
+# Image handling (optional, but good to have for e-commerce)
+Pillow>=10.2.0,<10.4.0 # Loosened upper bound slightly
+
+# Testing dependencies
+pytest>=8.0.0,<8.5.0
+pytest-cov>=6.0.0,<6.3.0 # Adjusted lower bound based on previous output
+httpx>=0.27.0,<0.29.0
+Faker>=37.0.0,<38.0.0 # Adjusted lower bound based on previous output
+
+# alembic>=1.13.0,<1.14.0 # Uncomment if you add Alembic for migrations
+
+# Note: It's good practice to periodically run `pip freeze > requirements.lock.txt`
+# in a clean virtual environment after `pip install -r requirements.txt`
+# to have a lock file with exact versions for reproducible deployments,
+# while `requirements.txt` maintains more flexible primary dependencies.
