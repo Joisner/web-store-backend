@@ -1,4 +1,4 @@
-# FastAPI E-commerce Backend
+# web-store-backend# FastAPI E-commerce Backend
 
 This is the backend for the e-commerce application, built with FastAPI and MySQL.
 
