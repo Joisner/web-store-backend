@@ -2,9 +2,8 @@ from sqlalchemy.orm import Session, joinedload, subqueryload
 from typing import Any, Dict, List, Optional, Union, Tuple
 
 from app.services.base import CRUDBase
-from app.models.product import Product
+from app.models.product import Product, ProductVariant
 from app.models.product_image import ProductImage
-from app.models.product_variant import ProductVariant
 from app.schemas.product import ProductCreate, ProductUpdate
 from app.schemas.product_image import ProductImageCreate, ProductImageUpdate
 from app.schemas.product_variant import ProductVariantCreate, ProductVariantUpdate
@@ -76,14 +75,22 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         # Handle variants
         if obj_in.variants:
             for var_data in obj_in.variants:
-                db_var = ProductVariant(**var_data.model_dump(), product=db_product)
-                # db.add(db_var)
+                variant_dict = var_data.model_dump() if hasattr(var_data, "model_dump") else dict(var_data)
+                # Asegúrate de que attributes sea un dict (no None ni string)
+                if "attributes" in variant_dict and variant_dict["attributes"] is not None:
+                    if not isinstance(variant_dict["attributes"], dict):
+                        try:
+                            import json
+                            variant_dict["attributes"] = json.loads(variant_dict["attributes"])
+                        except Exception:
+                            variant_dict["attributes"] = {}
+                db_var = ProductVariant(**variant_dict)
+                db_product.variants.append(db_var)  # <-- Esto ya lo tienes, es correcto
 
         try:
             db.add(db_product)
             db.commit()
             db.refresh(db_product)
-            # Load relationships for the returned object if they weren't automatically loaded by commit/refresh
             db.refresh(db_product, attribute_names=['images', 'variants', 'category'])
             return db_product
         except Exception as e:
@@ -199,4 +206,6 @@ get_multi_paginated = product_service.get_multi_paginated
 create = product_service.create
 get = product_service.get
 update = product_service.update
+add_product_image = product_service.add_product_image
+add_product_image = product_service.add_product_image
 add_product_image = product_service.add_product_image

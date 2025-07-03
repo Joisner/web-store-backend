@@ -212,41 +212,17 @@ async def upload_product_image(
     db_image = product_service.add_product_image(db, product=product, image_in=image_in)
     return db_image
 
-# Similar endpoints can be added for Product Variants
-# POST /{product_id}/variants
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# Similar endpoints can be added for Product Variants
-# POST /{product_id}/variants
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
-# PUT /variants/{variant_id}
-# DELETE /variants/{variant_id}
+@router.get("/{product_id}/stock-history", response_model=List[schemas.StockHistory])
+async def get_stock_history(
+    product_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    Get stock history for a product.
+    """
+    product = product_service.get(db, id=product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product.stock_histories
+

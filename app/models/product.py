@@ -61,3 +61,21 @@ class Product(Base):
 
     def __repr__(self):
         return f"<Product(id={self.id}, name='{self.name}', sku='{self.sku}')>"
+
+class ProductVariant(Base):
+    __tablename__ = "product_variants"
+
+    id = Column(Integer, primary_key=True, index=True)
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+    product = relationship("Product", back_populates="variants")
+
+    name = Column(String(255), nullable=False)
+    sku = Column(String(100), unique=True, index=True, nullable=False)
+    price = Column(Float, nullable=False)
+    stock = Column(Integer, default=0)
+    type = Column(String(50), nullable=False)
+    value = Column(String(100), nullable=False)
+    attributes = Column(JSON, nullable=True)  # <-- Agrega esta línea
+
+    def __repr__(self):
+        return f"<ProductVariant(id={self.id}, product_id={self.product_id}, sku='{self.sku}')>"

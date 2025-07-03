@@ -25,3 +25,6 @@ category_service = CRUDCategory(Category)
 get_multi_paginated = category_service.get_multi_paginated
 get_multi = category_service.get_multi
 get = category_service.get
+get_by_slug = category_service.get_by_slug
+create = category_service.create
+update = category_service.update
